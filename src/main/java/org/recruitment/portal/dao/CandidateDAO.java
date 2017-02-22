@@ -167,7 +167,7 @@ public class CandidateDAO {
 				candidateMaster.getCandidateLinks().get(linkId - 1).setEvaluationMaster(evalMasterList);
 				session.update(candidateMaster);
 
-			}	
+			}
 			return getByCandidateId(candId);
 		}
 		CandidateResponse cr = new CandidateResponse();
@@ -177,5 +177,4 @@ public class CandidateDAO {
 		return cr;
 	}
 
-	
 }
