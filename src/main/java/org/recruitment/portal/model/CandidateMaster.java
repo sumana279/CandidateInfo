@@ -40,6 +40,40 @@ public class CandidateMaster {
 	private Date createDate;
 	private Date modifiedDate;
 	private final String modifiedBy = "frontEndUser";
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinTable(joinColumns = @JoinColumn(name = "CanAttrResume_Link"), name = "CandResume_Link")
+	private List<ResumeHolder> resumes = new ArrayList<ResumeHolder>();
+
+	public CandidateMaster(long candidateId, String firstName, String lastName, String middleName, String phoneNo,
+			String email, String shortDesc, String visa, String candidateCurrentStatus,
+			List<CandidateLink> candidateLinks, long ctsId, Date createDate, Date modifiedDate) {
+		super();
+		this.candidateId = candidateId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.middleName = middleName;
+		this.phoneNo = phoneNo;
+		this.email = email;
+		this.shortDesc = shortDesc;
+		this.visa = visa;
+		this.candidateCurrentStatus = candidateCurrentStatus;
+		this.candidateLinks = candidateLinks;
+		this.ctsId = ctsId;
+		this.createDate = createDate;
+		this.modifiedDate = modifiedDate;
+	}
+
+	public CandidateMaster() {
+
+	}
+
+	public List<ResumeHolder> getResumes() {
+		return resumes;
+	}
+
+	public void setResumes(List<ResumeHolder> resumes) {
+		this.resumes = resumes;
+	}
 
 	public long getCandidateId() {
 		return candidateId;

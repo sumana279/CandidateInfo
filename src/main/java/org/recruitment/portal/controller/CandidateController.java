@@ -1,14 +1,24 @@
 package org.recruitment.portal.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
 
 import org.recruitment.portal.model.CandPayload;
 import org.recruitment.portal.model.CandidateMaster;
 import org.recruitment.portal.model.CandidateResponse;
 import org.recruitment.portal.model.EvaluationPayload;
+import org.recruitment.portal.model.ExecResponse;
 import org.recruitment.portal.model.ProjMasterPayload;
 import org.recruitment.portal.model.ProjectMaster;
 import org.recruitment.portal.model.ProjectResponse;
+import org.recruitment.portal.model.ResumeHolder;
+import org.recruitment.portal.model.ResumePayload;
+import org.recruitment.portal.model.ResumeResponse;
 import org.recruitment.portal.service.CandidateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,6 +60,8 @@ public class CandidateController {
 		try {
 			candPayload = new CandPayload();
 			candPayload = mapper.readValue(payload, CandPayload.class);
+			return candidateService.addCandidate(candPayload.getCandidate());
+
 		} catch (JsonParseException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
@@ -57,7 +69,8 @@ public class CandidateController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return candidateService.addCandidate(candPayload.getCandidate());
+		return new CandidateResponse(ExecResponse.FAILURE, "Please Check candidate id/link id as add candidate");
+
 	}
 
 	@RequestMapping(value = "/addProjects", method = RequestMethod.POST, headers = "Accept=application/json")
@@ -65,6 +78,8 @@ public class CandidateController {
 		try {
 			projMasterPayload = new ProjMasterPayload();
 			projMasterPayload = mapper.readValue(payload, ProjMasterPayload.class);
+			return candidateService.addProjects(projMasterPayload.getProjects());
+
 		} catch (JsonParseException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
@@ -72,13 +87,31 @@ public class CandidateController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return candidateService.addProjects(projMasterPayload.getProjects());
+		ProjectResponse pr = new ProjectResponse();
+		pr.setMessage("Sorry Failed to Add/Insert");
+		pr.setStatus(ExecResponse.FAILURE);
+		return pr;
 	}
 
-	@RequestMapping(value = "/updateCandidateProject/{projId}", method = RequestMethod.PUT, headers = "Accept=application/json")
-	public CandidateResponse updateCandidateProject(@RequestParam("candId") String candId,
-			@PathVariable("projId") String projId) {
-		return candidateService.updateCandidateProject(Long.parseLong(candId), Long.parseLong(projId));
+	@RequestMapping(value = "/updateCandidateProject", method = RequestMethod.PUT, headers = "Accept=application/json")
+	public CandidateResponse updateCandidateProject(@RequestBody String payload) {
+		try {
+			projMasterPayload = new ProjMasterPayload();	
+			projMasterPayload = mapper.readValue(payload, ProjMasterPayload.class);
+			if (projMasterPayload.getCandId() > 0 && projMasterPayload.getProjects().getProjId() > 0) {
+				return candidateService.updateCandidateProject(projMasterPayload.getCandId(),
+						projMasterPayload.getLinkId(), projMasterPayload.getProjects());
+			}
+			return new CandidateResponse(ExecResponse.FAILURE, "Please pass both candidateId/ProjectId");
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return new CandidateResponse(ExecResponse.FAILURE,
+				"Please Check candidate id/link id as unable to add project for a candidate");
 	}
 
 	@RequestMapping(value = "/getProjects", method = RequestMethod.GET, headers = "Accept=application/json")
@@ -106,6 +139,8 @@ public class CandidateController {
 		try {
 			evalPayload = new EvaluationPayload();
 			evalPayload = mapper.readValue(payload, EvaluationPayload.class);
+			return candidateService.addEvalResponse(evalPayload.getCandId(), evalPayload.getLinkId(),
+					evalPayload.getEvaluations());
 		} catch (JsonParseException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
@@ -113,8 +148,32 @@ public class CandidateController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return candidateService.addEvalResponse(evalPayload.getCandId(), evalPayload.getLinkId(),
-				evalPayload.getEvaluations());
+		return new CandidateResponse(ExecResponse.FAILURE,
+				"Please Check candidate id/link id as unable to add evaluation for a candidate");
+
 	}
 
+	@RequestMapping(value = "/getCandidateResume/{candId}", method = RequestMethod.GET, headers = "Accept=application/json")
+	public ResumeResponse getCandidateResume(@PathVariable("candId") long candId, @RequestParam("path") String path) {
+		return candidateService.getCandidateResume(candId, path);
+
+	}
+
+	@RequestMapping(value = "/updateCandResume", method = RequestMethod.PUT, headers = "Accept=application/json")
+	public ResumeResponse updateCandResume(@RequestBody String payload) {
+		ResumePayload resumePayload = null;
+
+		try {
+			resumePayload = new ResumePayload();
+			resumePayload = mapper.readValue(payload, ResumePayload.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return candidateService.updateCandResume(resumePayload.getResumeList(), resumePayload.getCandId());
+	}
 }

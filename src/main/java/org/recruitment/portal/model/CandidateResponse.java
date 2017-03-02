@@ -8,6 +8,22 @@ public class CandidateResponse {
 	private List<CandidateMaster> candMasterList;
 	private String message;
 
+	public CandidateResponse(ExecResponse status, String message) {
+		super();
+		this.status = status;
+		this.message = message;
+	}
+
+	public CandidateResponse(ExecResponse status, List<CandidateMaster> candMasterList, String message) {
+		super();
+		this.status = status;
+		this.candMasterList = candMasterList;
+		this.message = message;
+	}
+
+	public CandidateResponse() {
+	}
+
 	public ExecResponse getStatus() {
 		return status;
 	}

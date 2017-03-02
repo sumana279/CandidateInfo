@@ -11,6 +11,8 @@ import org.recruitment.portal.model.CandidateResponse;
 import org.recruitment.portal.model.EvaluationMaster;
 import org.recruitment.portal.model.ProjectMaster;
 import org.recruitment.portal.model.ProjectResponse;
+import org.recruitment.portal.model.ResumeHolder;
+import org.recruitment.portal.model.ResumeResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,13 +52,23 @@ public class CandidateService {
 	}
 
 	@Transactional
-	public CandidateResponse updateCandidateProject(long candId, long projId) {
-		return candidateDAO.updateCandidateProject(candId, projId);
+	public CandidateResponse updateCandidateProject(long candId, int linkId, ProjectMaster projectMaster) {
+		return candidateDAO.updateCandidateProject(candId, linkId, projectMaster);
 	}
 
 	@Transactional
 	public CandidateResponse addEvalResponse(long candId, int linkId, List<EvaluationMaster> evalMasterList) {
 		return candidateDAO.addEvalResponse(candId, linkId, evalMasterList);
+	}
+
+	@Transactional
+	public ResumeResponse getCandidateResume(long candId, String path) {
+		return candidateDAO.getCandidateResume(candId, path);
+	}
+
+	@Transactional
+	public ResumeResponse updateCandResume(List<ResumeHolder> resumeHolderList, long candId) {
+		return candidateDAO.updateCandResume(resumeHolderList, candId);
 	}
 
 }

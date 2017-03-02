@@ -34,9 +34,10 @@ public class CandidateLink {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinTable(joinColumns = @JoinColumn(name = "CanAttrEval_Link"), name = "CandEval_Link")
 	private List<EvaluationMaster> evaluationMaster = new ArrayList<EvaluationMaster>();
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinTable(joinColumns = @JoinColumn(name = "CanAttrResume_Link"), name = "CandResume_Link")
-	private List<ResumeHolder> resumes = new ArrayList<ResumeHolder>();
+	// @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	// @JoinTable(joinColumns = @JoinColumn(name = "CanAttrResume_Link"), name =
+	// "CandResume_Link")
+	// private List<ResumeHolder> resumes = new ArrayList<ResumeHolder>();
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinTable(joinColumns = @JoinColumn(name = "CanAttrProj_Link"), name = "CandProj_Link")
 	private List<ProjectMaster> projectId = new ArrayList<ProjectMaster>();
@@ -113,13 +114,13 @@ public class CandidateLink {
 		this.evaluationMaster = evaluationMaster;
 	}
 
-	public List<ResumeHolder> getResumes() {
-		return resumes;
-	}
+	// public List<ResumeHolder> getResumes() {
+	// return resumes;
+	// }
 
-	public void setResumes(List<ResumeHolder> resumes) {
-		this.resumes = resumes;
-	}
+	// public void setResumes(List<ResumeHolder> resumes) {
+	// this.resumes = resumes;
+	// }
 
 	public List<ProjectMaster> getProjectId() {
 		return projectId;
