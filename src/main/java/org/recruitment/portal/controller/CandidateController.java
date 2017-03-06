@@ -14,6 +14,9 @@ import org.recruitment.portal.model.CandidateResponse;
 import org.recruitment.portal.model.EvaluationPayload;
 import org.recruitment.portal.model.ExecResponse;
 import org.recruitment.portal.model.ProjMasterPayload;
+import org.recruitment.portal.model.ProjectInfoDetails;
+import org.recruitment.portal.model.ProjectInfoDetailsResponse;
+import org.recruitment.portal.model.ProjectInfoRequest;
 import org.recruitment.portal.model.ProjectMaster;
 import org.recruitment.portal.model.ProjectResponse;
 import org.recruitment.portal.model.ResumeHolder;
@@ -21,6 +24,7 @@ import org.recruitment.portal.model.ResumePayload;
 import org.recruitment.portal.model.ResumeResponse;
 import org.recruitment.portal.service.CandidateService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -96,7 +100,7 @@ public class CandidateController {
 	@RequestMapping(value = "/updateCandidateProject", method = RequestMethod.PUT, headers = "Accept=application/json")
 	public CandidateResponse updateCandidateProject(@RequestBody String payload) {
 		try {
-			projMasterPayload = new ProjMasterPayload();	
+			projMasterPayload = new ProjMasterPayload();
 			projMasterPayload = mapper.readValue(payload, ProjMasterPayload.class);
 			if (projMasterPayload.getCandId() > 0 && projMasterPayload.getProjects().getProjId() > 0) {
 				return candidateService.updateCandidateProject(projMasterPayload.getCandId(),
@@ -175,5 +179,21 @@ public class CandidateController {
 		}
 
 		return candidateService.updateCandResume(resumePayload.getResumeList(), resumePayload.getCandId());
+	}
+
+	// If possible move the executive summary to new controller not to club both
+	@RequestMapping(value = "/getPrjDtls4Exec", method = RequestMethod.PUT, headers = "Accept=application/json")
+	public @ResponseBody ProjectInfoDetailsResponse getPrjDtls4Exec(@RequestBody String payload) {
+		ProjectInfoRequest projectInfoRequest = null;
+
+		try {
+			projectInfoRequest = new ProjectInfoRequest();
+			projectInfoRequest = mapper.readValue(payload, ProjectInfoRequest.class);
+			return candidateService.getPrjDtls4Exec(projectInfoRequest);
+
+		} catch (Exception e) {
+			return new ProjectInfoDetailsResponse(ExecResponse.FAILURE, "Failed to get info for projectId"+ e);
+		}
+
 	}
 }

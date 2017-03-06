@@ -9,6 +9,8 @@ import org.recruitment.portal.dao.CandidateDAO;
 import org.recruitment.portal.model.CandidateMaster;
 import org.recruitment.portal.model.CandidateResponse;
 import org.recruitment.portal.model.EvaluationMaster;
+import org.recruitment.portal.model.ProjectInfoDetailsResponse;
+import org.recruitment.portal.model.ProjectInfoRequest;
 import org.recruitment.portal.model.ProjectMaster;
 import org.recruitment.portal.model.ProjectResponse;
 import org.recruitment.portal.model.ResumeHolder;
@@ -69,6 +71,11 @@ public class CandidateService {
 	@Transactional
 	public ResumeResponse updateCandResume(List<ResumeHolder> resumeHolderList, long candId) {
 		return candidateDAO.updateCandResume(resumeHolderList, candId);
+	}
+
+	@Transactional
+	public ProjectInfoDetailsResponse getPrjDtls4Exec(ProjectInfoRequest projectInfoRequest) {
+		return candidateDAO.getPrjDtls4Exec(projectInfoRequest);
 	}
 
 }

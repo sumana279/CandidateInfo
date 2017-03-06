@@ -26,6 +26,7 @@ public class ProjectMaster {
 	private Date createdDate;
 	private Date modifiedDate;
 	private String modifiedBy;
+	//private List<ProjSub> 
 
 	public long getProjId() {
 		return projId;

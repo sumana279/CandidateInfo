@@ -18,6 +18,9 @@ import org.recruitment.portal.model.CandidateMaster;
 import org.recruitment.portal.model.CandidateResponse;
 import org.recruitment.portal.model.EvaluationMaster;
 import org.recruitment.portal.model.ExecResponse;
+import org.recruitment.portal.model.ProjectInfoDetails;
+import org.recruitment.portal.model.ProjectInfoDetailsResponse;
+import org.recruitment.portal.model.ProjectInfoRequest;
 import org.recruitment.portal.model.ProjectMaster;
 import org.recruitment.portal.model.ProjectResponse;
 import org.recruitment.portal.model.ResumeHolder;
@@ -36,6 +39,11 @@ public class CandidateDAO {
 	private final String CAND_FULL_DETAILS = "from CandidateMaster cm  where cm.candidateId= :candidateId";
 	private final String CAND_BY_EMAIL = "select cm.candidateId,cm.email from CandidateMaster cm where cm.email = :email";
 	private static final String uploadedFileLocation = "//home//sudhan//Downloads//test.txt";
+	private static final String PROJ_EXEC_INFO = "select  cms.candidateId,cms.firstName,cms.lastName,cms.email,cms.phoneNo,cms.visa,clks.hiringStatus,cms.createDate,cms.modifiedDate,pms.projId,pms.projName,pms.location,pms.jobCategory from CandidateMaster cms LEFT JOIN cms.candidateLinks clks LEFT JOIN clks.projectId pms where pms.projId = :projId and pms.modifiedDate <= :modifiedDate";
+	private static final String PROJ_EXEC_INFO_FILTER = null;
+	private static final String _BY_STATUS = " and clks.hiringStatus in (:hiringStatus)";
+	private static final String _BY_CREATED_DATE = " and pms.createdDate >= (:createdDate)";
+	private static String FILTER = "";
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -294,4 +302,58 @@ public class CandidateDAO {
 					"Failed to upload Resume for candidateId with reason : " + ex);
 		}
 	}
+
+	@SuppressWarnings("unchecked")
+	public ProjectInfoDetailsResponse getPrjDtls4Exec(ProjectInfoRequest projectInfoRequest) {
+		String filter = "";
+		try {
+			final Session session = this.sessionFactory.getCurrentSession();
+			ProjectInfoDetails projectInfoDetails;
+			List<ProjectInfoDetails> projectInfoDetailsList = new ArrayList<>();
+			List<Object[]> projectInfoDetailsobj;
+			if (projectInfoRequest != null && projectInfoRequest.getProjId() > 0) {
+				if (projectInfoRequest.getStatusReq() != null) {
+					if (projectInfoRequest.getCreatedDate() != null) {
+						FILTER = PROJ_EXEC_INFO + _BY_STATUS + _BY_CREATED_DATE;
+						projectInfoDetailsobj = (List<Object[]>) session.createQuery(FILTER)
+								.setParameter("createdDate", projectInfoRequest.getCreatedDate())
+								.setParameter("modifiedDate",
+										projectInfoRequest.getModifiedDate() != null
+												? projectInfoRequest.getModifiedDate() : new Date())
+								.setParameterList("hiringStatus", projectInfoRequest.getStatusReq())
+								.setParameter("projId", projectInfoRequest.getProjId()).list();
+					} else {
+						FILTER = PROJ_EXEC_INFO + _BY_STATUS;
+						projectInfoDetailsobj = (List<Object[]>) session.createQuery(FILTER)
+								.setParameter("modifiedDate",
+										projectInfoRequest.getModifiedDate() != null
+												? projectInfoRequest.getModifiedDate() : new Date())
+								.setParameter("projId", projectInfoRequest.getProjId())
+								.setParameterList("hiringStatus", projectInfoRequest.getStatusReq()).list();
+
+					}
+				} else {
+					projectInfoDetailsobj = (List<Object[]>) session.createQuery(PROJ_EXEC_INFO)
+							.setParameter("modifiedDate", projectInfoRequest.getModifiedDate() != null
+									? projectInfoRequest.getModifiedDate() : new Date())
+							.setParameter("projId", projectInfoRequest.getProjId()).list();
+				}
+			} else {
+				return new ProjectInfoDetailsResponse(ExecResponse.FAILURE,
+						"Failed to get Info. Please enter valid ProjId : ");
+			}
+
+			for (Object[] tuple : projectInfoDetailsobj) {
+				projectInfoDetailsList.add(new ProjectInfoDetails(tuple[0], tuple[1], tuple[2], tuple[3], tuple[4],
+						tuple[5], tuple[6], tuple[7], tuple[8], tuple[9], tuple[10], tuple[11], tuple[12]));
+			}
+			return new ProjectInfoDetailsResponse(ExecResponse.OK, projectInfoDetailsList, "Successful ");
+
+		} catch (Exception ex) {
+			return new ProjectInfoDetailsResponse(ExecResponse.FAILURE,
+					"Failed to retrive info for ProjId with reason : " + ex);
+		}
+
+	}
+
 }
